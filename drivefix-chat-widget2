@@ -1,0 +1,540 @@
+<div id="drivefix-chat-widget" data-brand="DriveFix" data-webhook="https://fugudhustitif.beget.app/webhook/drivefix-auto-expert-chat"></div>
+
+<style>
+#drivefix-chat-widget {
+  --df-red: #e32632;
+  --df-red-hot: #ff414b;
+  --df-black: #090c10;
+  --df-graphite: #11151a;
+  --df-panel: #191e24;
+  --df-raised: #222930;
+  --df-line: rgba(235, 241, 246, .11);
+  --df-white: #f5f6f7;
+  --df-muted: #a4adb5;
+  --df-body: Inter, "Segoe UI", Arial, sans-serif;
+  position: fixed; z-index: 2147483000; right: 0; bottom: 0; width: 0; height: 0;
+  color: var(--df-white); font: 14px/1.5 var(--df-body); color-scheme: dark; isolation: isolate;
+}
+#drivefix-chat-widget, #drivefix-chat-widget * { box-sizing: border-box; }
+#drivefix-chat-widget button, #drivefix-chat-widget textarea { font: inherit; }
+#drivefix-chat-widget button { margin: 0; -webkit-tap-highlight-color: transparent; }
+#drivefix-chat-widget .df-launcher {
+  position: fixed; right: 0; bottom: 20px; display: flex; align-items: center; gap: 11px;
+  width: 226px; min-height: 66px; padding: 10px 15px 10px 12px; overflow: hidden;
+  color: var(--df-white); text-align: left; background: #171c22;
+  border: 1px solid rgba(255,255,255,.13); border-right: 0; border-left: 3px solid var(--df-red);
+  border-radius: 10px 0 0 10px; box-shadow: 0 9px 28px rgba(0,0,0,.34);
+  cursor: pointer; pointer-events: auto;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+  animation: df-launcher-enter .48s cubic-bezier(.2,.8,.2,1) both, df-launcher-breathe 5s 1.5s ease-in-out infinite;
+}
+#drivefix-chat-widget .df-launcher:hover, #drivefix-chat-widget .df-launcher:focus-visible { animation-play-state: paused; }
+#drivefix-chat-widget .df-launcher:hover {
+  transform: translateX(-5px); background: #20262d; border-color: rgba(255,255,255,.22);
+  border-left-color: var(--df-red-hot); box-shadow: 0 11px 30px rgba(227,38,50,.16);
+}
+#drivefix-chat-widget .df-launcher:active { transform: translateX(-2px); }
+#drivefix-chat-widget .df-launcher-icon {
+  display: grid; flex: 0 0 42px; place-items: center; width: 42px; height: 42px;
+  color: var(--df-red-hot); background: rgba(227,38,50,.12); border: 1px solid rgba(227,38,50,.28);
+  border-radius: 7px;
+}
+#drivefix-chat-widget .df-launcher-icon svg { width: 29px; height: 29px; }
+#drivefix-chat-widget .df-launcher-icon svg { transition: transform .24s cubic-bezier(.2,.8,.2,1); }
+#drivefix-chat-widget .df-launcher-icon svg { transform-origin: center; }
+#drivefix-chat-widget .df-launcher-icon:hover svg { transform: scale(1.1); }
+#drivefix-chat-widget .df-launcher-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
+#drivefix-chat-widget .df-launcher-title { color: #fff; font-size: 13px; font-weight: 650; line-height: 1.25; }
+#drivefix-chat-widget .df-launcher-sub { color: #aeb7bf; font-size: 10px; line-height: 1.2; }
+#drivefix-chat-widget .df-launcher-sub::before {
+  display: inline-block; width: 6px; height: 6px; margin: 0 5px 1px 0; background: #43d17d;
+  border-radius: 50%; content: ""; box-shadow: 0 0 7px rgba(67,209,125,.35);
+}
+#drivefix-chat-widget .df-launcher-arrow { display: grid; flex: 0 0 20px; place-items: center; color: #c0c6cc; }
+#drivefix-chat-widget .df-launcher-arrow svg { width: 17px; height: 17px; transition: transform .2s ease; }
+#drivefix-chat-widget.df-open .df-launcher-arrow svg { transform: rotate(180deg); }
+#drivefix-chat-widget .df-launcher:focus-visible { outline: 3px solid rgba(255,65,75,.8); outline-offset: 3px; }
+#drivefix-chat-widget .df-panel {
+  position: fixed; right: 18px; bottom: 100px; display: flex; flex-direction: column;
+  width: min(450px, calc(100vw - 32px)); height: min(640px, calc(100dvh - 124px));
+  min-height: min(460px, calc(100dvh - 124px)); overflow: hidden;
+  color: var(--df-white); background: var(--df-graphite);
+  border: 1px solid rgba(236,242,248,.15); border-radius: 15px;
+  box-shadow: 0 20px 54px rgba(0,0,0,.48), 0 0 0 1px rgba(255,255,255,.025);
+  transform-origin: bottom right; pointer-events: auto;
+}
+#drivefix-chat-widget .df-panel::before {
+  position: absolute; z-index: 5; top: 0; right: 0; width: 42%; height: 2px;
+  background: var(--df-red-hot); box-shadow: 0 0 12px rgba(255,65,75,.6);
+  content: ""; opacity: 0; pointer-events: none;
+}
+#drivefix-chat-widget .df-panel[hidden] { display: none; }
+#drivefix-chat-widget .df-panel.df-opening { animation: df-panel-in .38s cubic-bezier(.2,.8,.2,1) both; }
+#drivefix-chat-widget .df-panel.df-opening::before { animation: df-edge-sweep .52s ease-out both; }
+#drivefix-chat-widget .df-panel.df-closing { animation: df-panel-out .22s cubic-bezier(.4,0,1,1) both; pointer-events: none; }
+#drivefix-chat-widget .df-header {
+  position: relative; display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 13px 15px;
+  color: var(--df-white); background: #151a20; border-bottom: 1px solid var(--df-line);
+}
+#drivefix-chat-widget .df-brand-mark {
+  display: grid; flex: 0 0 44px; place-items: center; width: 44px; height: 44px;
+  color: #fff; background: var(--df-red); border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+}
+#drivefix-chat-widget .df-brand-mark svg { width: 30px; height: 30px; }
+#drivefix-chat-widget .df-brand-copy { min-width: 0; flex: 1; }
+#drivefix-chat-widget .df-brand-name {
+  margin: 0; overflow: hidden; color: #fff; font-size: 21px; font-weight: 680;
+  letter-spacing: -.025em; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap;
+}
+#drivefix-chat-widget .df-brand-sub { display: flex; align-items: center; gap: 7px; margin-top: 5px; color: #b9c0c6; font-size: 11px; font-weight: 500; }
+#drivefix-chat-widget .df-online-dot { flex: 0 0 7px; width: 7px; height: 7px; background: #43d17d; border-radius: 50%; box-shadow: 0 0 9px rgba(67,209,125,.34); animation: df-online-pulse 2.6s ease-in-out infinite; }
+#drivefix-chat-widget .df-close {
+  display: grid; flex: 0 0 40px; place-items: center; width: 40px; height: 40px; padding: 0;
+  color: #edf0f2; background: transparent; border: 1px solid rgba(255,255,255,.2);
+  border-radius: 7px; cursor: pointer; transition: background-color .16s ease, border-color .16s ease;
+}
+#drivefix-chat-widget .df-close:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); }
+#drivefix-chat-widget .df-close svg { width: 18px; height: 18px; transition: transform .2s ease; }
+#drivefix-chat-widget .df-close:hover svg { transform: rotate(90deg); }
+#drivefix-chat-widget .df-chat-body { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; background: #11151a; }
+#drivefix-chat-widget .df-transcript {
+  position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; gap: 13px;
+  min-width: 0; min-height: 0; overflow: auto; padding: 17px 15px; overscroll-behavior: contain;
+  scrollbar-color: #46505a #11151a; scrollbar-width: thin;
+}
+#drivefix-chat-widget .df-transcript::-webkit-scrollbar { width: 7px; }
+#drivefix-chat-widget .df-transcript::-webkit-scrollbar-track { background: #11151a; }
+#drivefix-chat-widget .df-transcript::-webkit-scrollbar-thumb { background: #46505a; border: 2px solid #11151a; border-radius: 5px; }
+#drivefix-chat-widget .df-transcript::-webkit-scrollbar-thumb:hover { background: #66717c; }
+#drivefix-chat-widget .df-message { display: flex; align-items: flex-start; gap: 8px; width: 100%; min-width: 0; animation: df-message-in .18s ease-out both; }
+#drivefix-chat-widget .df-message--user { align-self: flex-end; justify-content: flex-end; }
+#drivefix-chat-widget .df-message--assistant { align-self: flex-start; }
+#drivefix-chat-widget .df-ai-mark {
+  display: grid; flex: 0 0 30px; place-items: center; width: 30px; height: 30px; margin-top: 4px;
+  color: var(--df-red-hot); background: #252c33; border: 1px solid rgba(255,255,255,.07); border-radius: 50%;
+}
+#drivefix-chat-widget .df-ai-mark svg { width: 19px; height: 19px; }
+#drivefix-chat-widget .df-message--assistant .df-ai-mark { animation: df-mark-in .3s cubic-bezier(.2,.8,.2,1) both; }
+#drivefix-chat-widget .df-bubble {
+  min-width: 0; max-width: min(340px, calc(100% - 38px)); padding: 10px 12px 11px;
+  color: #f0f2f3; background: #20262d; border: 1px solid rgba(238,243,248,.075); border-radius: 13px 13px 13px 4px;
+}
+#drivefix-chat-widget .df-message--user .df-bubble {
+  max-width: min(320px, 88%); color: #f7f7f8; background: #252c33;
+  border-color: rgba(238,243,248,.08); border-right: 3px solid var(--df-red); border-radius: 13px 13px 4px 13px;
+}
+#drivefix-chat-widget .df-message-tag { display: block; margin: 0 0 4px; color: #ff6670; font-size: 10px; font-weight: 650; line-height: 1.2; }
+#drivefix-chat-widget .df-message--user .df-message-tag { color: #aeb7bf; }
+#drivefix-chat-widget .df-message-text { margin: 0; color: inherit; font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+#drivefix-chat-widget .df-pending .df-message-text { color: #c0c7cd; }
+#drivefix-chat-widget .df-typing-dots { display: inline-flex; gap: 3px; margin-left: 5px; vertical-align: middle; }
+#drivefix-chat-widget .df-typing-dots i { width: 4px; height: 4px; background: var(--df-red-hot); border-radius: 50%; animation: df-dot 1s infinite ease-in-out; }
+#drivefix-chat-widget .df-typing-dots i:nth-child(2) { animation-delay: .14s; }
+#drivefix-chat-widget .df-typing-dots i:nth-child(3) { animation-delay: .28s; }
+#drivefix-chat-widget .df-retry {
+  min-height: 35px; margin-top: 9px; padding: 6px 10px; color: #ff7880; background: #191e24;
+  border: 1px solid rgba(255,65,75,.55); border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: color .16s ease, background-color .16s ease;
+}
+#drivefix-chat-widget .df-retry:hover { color: #fff; background: #9f2029; }
+#drivefix-chat-widget .df-composer { flex: 0 0 auto; padding: 10px 13px 11px; background: #171c22; border-top: 1px solid var(--df-line); }
+#drivefix-chat-widget .df-quick-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 37px; margin-bottom: 5px; }
+#drivefix-chat-widget .df-quick-heading { margin: 0; color: #d8dde1; font-size: 12px; font-weight: 650; letter-spacing: -.01em; }
+#drivefix-chat-widget .df-quick-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 74px; min-height: 36px; padding: 5px 7px;
+  color: #ff7880; background: transparent; border: 0; border-radius: 5px; cursor: pointer;
+  font-size: 11px; font-weight: 600; transition: color .16s ease, background-color .16s ease;
+}
+#drivefix-chat-widget .df-quick-toggle:hover { color: #fff; background: rgba(227,38,50,.12); }
+#drivefix-chat-widget .df-quick-toggle svg { width: 13px; height: 13px; transition: transform .18s ease; }
+#drivefix-chat-widget .df-quick-toggle[aria-expanded="false"] svg { transform: rotate(180deg); }
+#drivefix-chat-widget .df-actions[hidden] { display: none; }
+#drivefix-chat-widget .df-composer.df-actions-collapsed .df-actions { margin-bottom: 0; }
+#drivefix-chat-widget .df-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 10px; }
+#drivefix-chat-widget .df-action {
+  display: flex; align-items: center; gap: 9px; min-width: 0; min-height: 47px; padding: 8px 10px;
+  color: #e9ecef; text-align: left; background: #20262d; border: 1px solid #303840; border-radius: 8px; cursor: pointer;
+  font-size: 12px; font-weight: 560; line-height: 1.28;
+  transition: color .16s ease, background-color .16s ease, border-color .16s ease, transform .16s ease;
+  animation: df-action-arrive .32s cubic-bezier(.2,.8,.2,1) backwards;
+}
+#drivefix-chat-widget .df-action:nth-child(2) { animation-delay: .035s; }
+#drivefix-chat-widget .df-action:nth-child(3) { animation-delay: .07s; }
+#drivefix-chat-widget .df-action:nth-child(4) { animation-delay: .105s; }
+#drivefix-chat-widget .df-action:nth-child(5) { animation-delay: .14s; }
+#drivefix-chat-widget .df-action:last-child { grid-column: 1 / -1; }
+#drivefix-chat-widget .df-action:hover { transform: translateY(-1px); background: #272e36; border-color: rgba(255,65,75,.72); }
+#drivefix-chat-widget .df-action:active { transform: scale(.99); }
+#drivefix-chat-widget .df-action:disabled { opacity: .56; cursor: not-allowed; transform: none; }
+#drivefix-chat-widget .df-action-icon { display: grid; flex: 0 0 21px; place-items: center; width: 21px; height: 21px; color: var(--df-red-hot); }
+#drivefix-chat-widget .df-action-icon svg { display: block; width: 21px; height: 21px; }
+#drivefix-chat-widget .df-action-icon svg { transition: transform .22s cubic-bezier(.2,.8,.2,1); }
+#drivefix-chat-widget .df-action:hover .df-action-icon svg { transform: scale(1.12) rotate(-5deg); }
+#drivefix-chat-widget .df-action-label { display: block; min-width: 0; }
+#drivefix-chat-widget .df-form { margin: 0; }
+#drivefix-chat-widget .df-input-row {
+  display: flex; align-items: flex-end; gap: 7px; min-height: 53px; padding: 4px;
+  background: #101419; border: 1px solid #343c44; border-radius: 9px; transition: border-color .16s ease, box-shadow .16s ease;
+}
+#drivefix-chat-widget .df-input-row:focus-within { border-color: var(--df-red); box-shadow: 0 0 0 3px rgba(227,38,50,.16); }
+#drivefix-chat-widget .df-input {
+  display: block; flex: 1; min-width: 0; min-height: 41px; max-height: 112px; padding: 10px 8px;
+  color: #f4f5f6; background: transparent; border: 0; outline: 0; resize: none; font-size: 13px; line-height: 1.4; overflow-wrap: anywhere;
+}
+#drivefix-chat-widget .df-input::placeholder { color: #929ca5; opacity: 1; }
+#drivefix-chat-widget .df-input:disabled { opacity: .68; }
+#drivefix-chat-widget .df-send {
+  display: grid; flex: 0 0 43px; place-items: center; width: 43px; height: 43px; padding: 0;
+  color: #fff; background: var(--df-red); border: 0; border-radius: 7px; cursor: pointer; transition: background-color .16s ease, transform .16s ease;
+}
+#drivefix-chat-widget .df-send:hover:not(:disabled) { background: #c91f2b; }
+#drivefix-chat-widget .df-send:active:not(:disabled) { transform: scale(.96); }
+#drivefix-chat-widget .df-send:disabled { opacity: .48; cursor: not-allowed; }
+#drivefix-chat-widget .df-send svg { width: 19px; height: 19px; }
+#drivefix-chat-widget .df-send svg { transition: transform .18s ease; }
+#drivefix-chat-widget .df-send:hover:not(:disabled) svg { transform: translate(2px,-2px); }
+#drivefix-chat-widget .df-footnote { margin: 6px 2px 0; color: #85909a; font-size: 9px; line-height: 1.35; }
+#drivefix-chat-widget :where(button, textarea):focus-visible { outline: 3px solid rgba(255,65,75,.78); outline-offset: 2px; }
+#drivefix-chat-widget .df-input:focus-visible { outline: 0; }
+@keyframes df-launcher-enter { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes df-launcher-breathe {
+  0%, 88%, 100% { box-shadow: 0 9px 28px rgba(0,0,0,.34); }
+  94% { box-shadow: 0 9px 28px rgba(0,0,0,.34), 0 0 18px rgba(227,38,50,.2); }
+}
+@keyframes df-online-pulse { 0%,100% { opacity: .82; box-shadow: 0 0 5px rgba(67,209,125,.2); } 50% { opacity: 1; box-shadow: 0 0 10px rgba(67,209,125,.48); } }
+@keyframes df-panel-in {
+  0% { opacity: 0; transform: translate(20px,16px) scale(.94); }
+  72% { opacity: 1; transform: translate(0,0) scale(1.008); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes df-panel-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translate(16px,12px) scale(.95); }
+}
+@keyframes df-mark-in { from { opacity: 0; transform: scale(.68) rotate(-10deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes df-action-arrive { from { opacity: 0; transform: translateY(7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes df-edge-sweep {
+  0% { opacity: 0; transform: translateX(100%); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-260%); }
+}
+@keyframes df-message-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes df-dot { 0%,60%,100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+@media (max-width: 520px) {
+  #drivefix-chat-widget { width: 100%; height: 100%; pointer-events: none; }
+  #drivefix-chat-widget .df-launcher {
+    right: 0; bottom: max(14px,env(safe-area-inset-bottom,0px)); width: min(218px,calc(100vw - 36px));
+    min-height: 60px; pointer-events: auto;
+  }
+  #drivefix-chat-widget.df-open .df-launcher { visibility: hidden; pointer-events: none; }
+  #drivefix-chat-widget .df-panel {
+    top: max(7px,env(safe-area-inset-top,0px)); right: max(7px,env(safe-area-inset-right,0px));
+    bottom: max(7px,env(safe-area-inset-bottom,0px)); left: max(7px,env(safe-area-inset-left,0px));
+    width: auto; height: auto; min-width: 0; min-height: 0; border-radius: 13px; transform-origin: center bottom;
+  }
+  #drivefix-chat-widget .df-header { min-height: 69px; padding: 10px 11px; }
+  #drivefix-chat-widget .df-brand-mark { flex-basis: 40px; width: 40px; height: 40px; }
+  #drivefix-chat-widget .df-brand-name { font-size: 19px; }
+  #drivefix-chat-widget .df-transcript { padding: 13px 11px; gap: 10px; }
+  #drivefix-chat-widget .df-composer { padding: 8px 9px calc(8px + env(safe-area-inset-bottom,0px)); }
+  #drivefix-chat-widget .df-action { min-height: 45px; padding: 7px 8px; font-size: 11.5px; }
+  #drivefix-chat-widget .df-input-row { min-height: 50px; }
+}
+@media (max-width: 360px) {
+  #drivefix-chat-widget .df-actions { grid-template-columns: 1fr; }
+  #drivefix-chat-widget .df-action:last-child { grid-column: auto; }
+  #drivefix-chat-widget .df-action { min-height: 40px; }
+}
+@media (max-height: 700px) and (max-width: 520px) {
+  #drivefix-chat-widget .df-panel {
+    top: max(4px,env(safe-area-inset-top,0px)); right: max(4px,env(safe-area-inset-right,0px));
+    bottom: max(4px,env(safe-area-inset-bottom,0px)); left: max(4px,env(safe-area-inset-left,0px));
+  }
+  #drivefix-chat-widget .df-header { min-height: 64px; }
+  #drivefix-chat-widget .df-composer { padding-top: 5px; }
+  #drivefix-chat-widget .df-quick-bar { min-height: 33px; }
+  #drivefix-chat-widget .df-action { min-height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #drivefix-chat-widget *, #drivefix-chat-widget *::before, #drivefix-chat-widget *::after {
+    scroll-behavior: auto !important; animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important; transition-duration: .01ms !important;
+  }
+}
+</style>
+
+<script>
+(() => {
+  const root = document.getElementById("drivefix-chat-widget");
+  if (!root || root.dataset.initialized === "true") return;
+  root.dataset.initialized = "true";
+
+  const webhook = root.dataset.webhook || "https://fugudhustitif.beget.app/webhook/drivefix-auto-expert-chat";
+  const brand = root.dataset.brand || "DriveFix";
+  const makeId = () => (window.crypto && typeof window.crypto.randomUUID === "function")
+    ? window.crypto.randomUUID()
+    : `df-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+  const storedId = (key) => {
+    try {
+      let value = window.sessionStorage.getItem(key);
+      if (!value) { value = makeId(); window.sessionStorage.setItem(key, value); }
+      return value;
+    } catch (_) { return makeId(); }
+  };
+  const userId = storedId("drivefixWidgetUserId");
+  const chatId = storedId("drivefixWidgetChatId");
+
+  root.insertAdjacentHTML("beforeend", `
+    <button class="df-launcher" type="button" aria-label="Открыть чат DriveFix" aria-controls="df-chat-panel" aria-expanded="false">
+      <span class="df-launcher-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="df-launcher-copy"><span class="df-launcher-title">Чат DriveFix</span><span class="df-launcher-sub">AI-консультант · онлайн</span></span>
+      <span class="df-launcher-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="m12.5 4.5-5.5 5.5 5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <section class="df-panel" id="df-chat-panel" role="region" aria-label="Чат с AI-ассистентом автосервиса" hidden>
+      <header class="df-header">
+        <span class="df-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div class="df-brand-copy">
+          <h2 class="df-brand-name"></h2>
+          <div class="df-brand-sub"><i class="df-online-dot" aria-hidden="true"></i><span>AI-консультант · онлайн</span></div>
+        </div>
+        <button class="df-close" type="button" aria-label="Закрыть чат">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <div class="df-chat-body">
+        <div class="df-transcript" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Сообщения чата"></div>
+      </div>
+      <div class="df-composer">
+        <div class="df-quick-bar">
+          <p class="df-quick-heading">Быстрые действия</p>
+          <button class="df-quick-toggle" type="button" aria-expanded="true" aria-controls="df-quick-actions">
+            <span class="df-quick-toggle-label">Свернуть</span>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="df-actions" id="df-quick-actions" aria-label="Частые вопросы">
+          <button class="df-action" type="button" data-prompt="Хочу записаться на ремонт"><span class="df-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5.5" width="17" height="15" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 3.5v4m9-4v4M3.5 10h17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="df-action-label">Записаться на ремонт</span></button>
+          <button class="df-action" type="button" data-prompt="Нужна диагностика автомобиля"><span class="df-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="df-action-label">Диагностика автомобиля</span></button>
+          <button class="df-action" type="button" data-prompt="Хочу узнать стоимость услуг"><span class="df-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20.5 13.2 13.2 20.5 3.5 10.8V3.5h7.3l9.7 9.7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.1" cy="8.1" r="1.2" fill="currentColor"/></svg></span><span class="df-action-label">Узнать стоимость</span></button>
+          <button class="df-action" type="button" data-prompt="Нужен шиномонтаж"><span class="df-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="6.25" stroke="currentColor" stroke-width="2.1"/><path d="M12 9.9V5.75m1.8 5.2 3.6-2.08m-3.6 4.16 3.6 2.08M12 14.1v4.15m-1.8-5.23-3.6 2.08m3.6-4.16-3.6-2.08" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12" cy="12" r="1.85" fill="currentColor"/></svg></span><span class="df-action-label">Шиномонтаж</span></button>
+          <button class="df-action" type="button" data-prompt="Нужен ремонт двигателя"><span class="df-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h10v5.8l-1.4 4H8.4L7 9.3V3.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M7 5.8h10M7 7.8h10" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/><circle cx="12" cy="10.4" r="1.15" stroke="currentColor" stroke-width="1.5"/><path d="M10.8 12.7v4m2.4-4v4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="19" r="2" stroke="currentColor" stroke-width="1.9"/></svg></span><span class="df-action-label">Ремонт двигателя</span></button>
+        </div>
+        <form class="df-form" novalidate>
+          <div class="df-input-row">
+            <textarea class="df-input" rows="1" maxlength="4000" placeholder="Опишите проблему с автомобилем…" aria-label="Сообщение для AI-ассистента"></textarea>
+            <button class="df-send" type="submit" aria-label="Отправить сообщение" disabled>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 3 10.8 13.2M21 3l-6.5 18-3.7-7.8L3 9.5 21 3Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <p class="df-footnote">Предварительная оценка не заменяет диагностику специалиста. Не вводите данные карт и пароли.</p>
+        </form>
+      </div>
+    </section>
+  `);
+
+  const panel = root.querySelector(".df-panel");
+  const launcher = root.querySelector(".df-launcher");
+  const closeButton = root.querySelector(".df-close");
+  const transcript = root.querySelector(".df-transcript");
+  const form = root.querySelector(".df-form");
+  const input = root.querySelector(".df-input");
+  const sendButton = root.querySelector(".df-send");
+  const quickToggle = root.querySelector(".df-quick-toggle");
+  const quickActions = root.querySelector(".df-actions");
+  const composer = root.querySelector(".df-composer");
+  const actionButtons = [...root.querySelectorAll(".df-action")];
+  root.querySelector(".df-brand-name").textContent = brand;
+
+  const assistantIcon = `<span class="df-ai-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  let sending = false;
+  let pendingNode = null;
+
+  function scrollToLatest() { transcript.scrollTop = transcript.scrollHeight; }
+  function addMessage(role, text, options = {}) {
+    const message = document.createElement("article");
+    message.className = `df-message df-message--${role}${options.pending ? " df-pending" : ""}`;
+    if (role === "assistant") message.insertAdjacentHTML("beforeend", assistantIcon);
+    const bubble = document.createElement("div");
+    bubble.className = "df-bubble";
+    const tag = document.createElement("span");
+    tag.className = "df-message-tag";
+    tag.textContent = role === "user" ? "Вы" : "AI · Автосервис";
+    const copy = document.createElement("p");
+    copy.className = "df-message-text";
+    copy.textContent = text;
+    bubble.append(tag, copy);
+    if (options.pending) {
+      const dots = document.createElement("span");
+      dots.className = "df-typing-dots";
+      dots.setAttribute("aria-hidden", "true");
+      dots.innerHTML = "<i></i><i></i><i></i>";
+      copy.append(dots);
+    }
+    if (options.retryText) {
+      const retry = document.createElement("button");
+      retry.className = "df-retry";
+      retry.type = "button";
+      retry.textContent = "Повторить отправку";
+      retry.addEventListener("click", () => {
+        message.remove();
+        sendMessage(options.retryText, false);
+      });
+      bubble.append(retry);
+    }
+    message.append(bubble);
+    transcript.append(message);
+    scrollToLatest();
+    return message;
+  }
+
+  function setBusy(value) {
+    sending = value;
+    input.disabled = value;
+    sendButton.disabled = value || !input.value.trim();
+    sendButton.setAttribute("aria-busy", String(value));
+    actionButtons.forEach((button) => { button.disabled = value; });
+  }
+
+  function parseReply(raw, contentType) {
+    if ((contentType || "").includes("application/json")) {
+      try {
+        const data = JSON.parse(raw);
+        return String(data.output ?? data.text ?? data.response ?? data.message ?? "").trim();
+      } catch (_) { /* fall through to plain text */ }
+    }
+    const text = String(raw || "").trim();
+    if (text.startsWith("{") || text.startsWith("[")) {
+      try {
+        const data = JSON.parse(text);
+        if (typeof data === "string") return data;
+        return String(data.output ?? data.text ?? data.response ?? data.message ?? text).trim();
+      } catch (_) { /* response is ordinary text */ }
+    }
+    return text;
+  }
+
+  async function sendMessage(rawText, showUserMessage = true) {
+    const text = String(rawText || "").trim();
+    if (!text || sending) return;
+    if (showUserMessage) addMessage("user", text);
+    input.value = "";
+    input.style.height = "auto";
+    setBusy(true);
+    pendingNode = addMessage("assistant", "Подбираю ответ", { pending: true });
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 45000);
+    try {
+      const response = await fetch(webhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams({ chatInput: text, userId, chatId }).toString(),
+        signal: controller.signal,
+      });
+      const rawReply = await response.text();
+      if (!response.ok) {
+        const error = new Error("Webhook request failed");
+        error.status = response.status;
+        throw error;
+      }
+      const reply = parseReply(rawReply, response.headers.get("content-type"));
+      pendingNode.remove();
+      pendingNode = null;
+      addMessage("assistant", reply || "Не удалось подготовить ответ. Попробуйте задать вопрос иначе.");
+    } catch (error) {
+      if (pendingNode) pendingNode.remove();
+      pendingNode = null;
+      const message = error?.status === 404
+        ? "Webhook не найден. Проверьте production URL и публикацию workflow."
+        : error?.name === "AbortError"
+          ? "Автосервис долго не отвечает. Попробуйте отправить сообщение ещё раз."
+          : "Не удалось связаться с автосервисом. Проверьте интернет и попробуйте ещё раз.";
+      addMessage("assistant", message, { retryText: text });
+    } finally {
+      window.clearTimeout(timeout);
+      setBusy(false);
+      if (!panel.hidden) input.focus({ preventScroll: true });
+      scrollToLatest();
+    }
+  }
+
+  function openChat() {
+    panel.hidden = false;
+    root.classList.add("df-open");
+    launcher.setAttribute("aria-expanded", "true");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    launcher.setAttribute("aria-label", "Свернуть чат DriveFix");
+    requestAnimationFrame(() => panel.classList.add("df-opening"));
+    window.setTimeout(() => input.focus({ preventScroll: true }), 80);
+  }
+  function closeChat() {
+    if (panel.hidden || panel.classList.contains("df-closing")) return;
+    panel.classList.remove("df-opening");
+    panel.classList.add("df-closing");
+    const finishClose = () => {
+      if (panel.hidden) return;
+      panel.hidden = true;
+      panel.classList.remove("df-closing");
+      root.classList.remove("df-open");
+      launcher.setAttribute("aria-expanded", "false");
+      launcher.setAttribute("aria-label", "Открыть чат DriveFix");
+      launcher.focus({ preventScroll: true });
+    };
+    const onCloseAnimation = (event) => {
+      if (event.target !== panel || event.animationName !== "df-panel-out") return;
+      window.clearTimeout(closeFallback);
+      panel.removeEventListener("animationend", onCloseAnimation);
+      finishClose();
+    };
+    panel.addEventListener("animationend", onCloseAnimation);
+    const closeFallback = window.setTimeout(() => {
+      panel.removeEventListener("animationend", onCloseAnimation);
+      finishClose();
+    }, 300);
+  }
+
+  launcher.addEventListener("click", () => panel.hidden ? openChat() : closeChat());
+  closeButton.addEventListener("click", closeChat);
+  quickToggle.addEventListener("click", () => {
+    const expanded = quickToggle.getAttribute("aria-expanded") === "true";
+    quickToggle.setAttribute("aria-expanded", String(!expanded));
+    quickToggle.querySelector(".df-quick-toggle-label").textContent = expanded ? "Показать" : "Свернуть";
+    quickActions.hidden = expanded;
+    composer.classList.toggle("df-actions-collapsed", expanded);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !panel.hidden && root.contains(document.activeElement)) closeChat();
+  });
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = `${Math.min(input.scrollHeight, 112)}px`;
+    sendButton.disabled = sending || !input.value.trim();
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
+      event.preventDefault();
+      sendMessage(input.value);
+    }
+  });
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendMessage(input.value);
+  });
+  actionButtons.forEach((button) => button.addEventListener("click", () => sendMessage(button.dataset.prompt)));
+
+  addMessage("assistant", "Здравствуйте! Я AI-помощник " + brand + ". Опишите, что случилось с автомобилем, — подскажу возможные причины и помогу записаться в сервис.");
+})();
+</script>
